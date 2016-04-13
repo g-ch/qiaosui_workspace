@@ -16,7 +16,7 @@
 #include <string.h>
 
 //注意：这里要把自己的系统用户名改掉，不然无法保存截图
-#define  system_user_name "chg"
+#define  system_user_name "cc"
 
 //显示图幅
 #define image_area_width 784

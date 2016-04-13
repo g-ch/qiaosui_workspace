@@ -8,8 +8,8 @@
 #include <QPainter>
 #include <QTabWidget>
 
-#define painting_area_width 446//绘图区大小设定,改变这里后窗口内绘图大小随之改变
-#define painting_area_height 266
+#define painting_area_width 360//绘图区大小设定,改变这里后窗口内绘图大小随之改变
+#define painting_area_height 210
 
 class StatusPainter :public QWidget
 {

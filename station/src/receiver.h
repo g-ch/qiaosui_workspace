@@ -15,6 +15,30 @@ using namespace std;
 struct Imu_Data
 {
 };
+struct Extra_Function
+{
+    unsigned short obs_avoid_enable;
+    unsigned short laser_height_enable;
+    unsigned short add_one;
+    unsigned short add_two;
+    unsigned short add_three;
+};
+
+struct Laser_Distance
+{
+    float min_distance;
+    float angle;
+    float laser_x;
+    float laser_y;
+};
+
+struct Pump
+{
+    float pump_speed_sp;
+    float spray_speed_sp;
+    float pump_speed;
+    float spray_speed;
+};
 
 struct Global_Position
 {
@@ -85,6 +109,31 @@ struct Optical_Flow
     double quality;
 };
 
+struct Offboard_Setpoints
+{
+    float px_1;
+    float py_1;
+    float ph_1;
+    float px_2;
+    float py_2;
+    float ph_2;
+    float yaw;
+    int seq;
+    int total;
+};
+
+struct Setpoints_Receive
+{
+    float px_1;
+    float py_1;
+    float ph_1;
+    float px_2;
+    float py_2;
+    float ph_2;
+    int seq;
+    int num;
+};
+
 class MavrosMessage : public QThread
 {
     Q_OBJECT
@@ -103,6 +152,16 @@ public:
     double time_fromboost;
     struct Wind_Speed wind_speed;
     struct Optical_Flow optical_flow;
+
+    struct Pump pump;
+    struct Offboard_Setpoints setpoints_send;
+    struct Setpoints_Receive setpoints_receive;
+    struct Extra_Function extra_function;
+    struct Laser_Distance laser_distance;
+
+    int success_counter;
+
+
     /*******信号发射函数******/
     void msg_Send_State()const {emit state_Mode_Signal();}
     void msg_Send_GPS()const {emit global_GPS_Signal();}
@@ -112,10 +171,12 @@ public:
     void msg_Send_Rel_Alt()const{emit global_Rel_Alt_Signal();}
     void msg_Send_Orientation()const{emit local_Orientation_Signal();}
     void msg_Send_GPS_Satellites()const{emit global_GPS_Satellites_Signal();}
-    void msg_Send_Optical_Flow()const{emit optical_Flow_Signal();}
+    void msg_Send_Laser_Distance()const{emit laser_Distance_Signal();}
     void msg_Send_Imu_Data()const{emit imu_Data_Signal();}
     void msg_Send_Temperature()const{emit temperature_Signal();}
     void msg_Send_Time()const{emit time_Signal();}
+    void msg_Send_Setpoints_Confirm()const{emit setpoints_Confirm_Signal();}
+    void msg_Send_Pump_Status()const{emit pump_Status_Signal();}
 
     /**********信号**********/
 signals:
@@ -128,10 +189,13 @@ signals:
     void global_Compass_Signal()const;
     void global_Rel_Alt_Signal()const;
     void local_Orientation_Signal()const;
-    void optical_Flow_Signal()const;
+    void laser_Distance_Signal()const;
     void imu_Data_Signal()const;
     void temperature_Signal()const;
     void time_Signal()const;
+    void offboard_Set_Signal()const;
+    void setpoints_Confirm_Signal()const;
+    void pump_Status_Signal()const;
 };
 
 

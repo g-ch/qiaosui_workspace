@@ -4,9 +4,10 @@
 #include <QApplication>
 #include "ros/ros.h"
 #include "receiver.h"
-#include "camera.h"
 #include "painterWiget.h"
+#include "camera.h"
 #include <QTextCodec>
+
 MavrosMessage message;
 Camera camera_video;
 
@@ -23,9 +24,8 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.showMaximized();//最大化显示
 
-    ros::init(argc, argv, "receiver");
+    ros::init(argc,argv,"receiver");
     message.start();
-    camera_video.start();
 
     return a.exec();
 }
