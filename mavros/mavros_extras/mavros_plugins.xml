@@ -48,8 +48,6 @@
     <class name="sonar_receiver" type="mavplugin::SonarReceiverPlugin" base_class_type="mavplugin::MavRosPlugin">
 	<description>Writtren by Clarence Chan for laser distance</description>
 	</class>
-    <class name="sonar_receiver" type="mavplugin::SonarReceiverPlugin" base_class_type="mavplugin::MavRosPlugin">
-	<description>Writtren by Clarence Chan for laser distance</description>
-	</class>
+
 
 </library>

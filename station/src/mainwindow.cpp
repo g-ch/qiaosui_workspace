@@ -168,6 +168,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->lineEdit_Measure_Compensation->setValidator(new QDoubleValidator(-100.0,100.0,2,this));
     ui->lineEdit_Spray_Width->setValidator(new QDoubleValidator(0.0,10.0,2,this));
     ui->lineEdit_Spray_Length->setValidator(new QDoubleValidator(0.0,10.0,2,this));
+    ui->lineEdit_Fly_Height_Up->setValidator(new QDoubleValidator(0.0,100.0,2,this));
 
     //set common flight settings
     ui->radioButton_Left_Common->setChecked(true);
@@ -314,6 +315,10 @@ void MainWindow::init_paras()
     common_times = -1;
     common_side = true;
     common_mode = false;
+
+    /*for up flight*/
+    up_mode = false;
+    standard_height = 0.0;
 
     route_plan_mode = 0;
 
@@ -490,7 +495,11 @@ void MainWindow::local_Position_Slot()
          real_position[position_num][0]= -message.local_position.position.y; //W->E: y->x
          cout<<"real_position[position_num][0]"<<real_position[position_num][0]<<endl;
 
-         if(position_num>0) draw_route(2); //draw
+         if(position_num>0) //draw
+         {
+             if(!up_mode) draw_route(2);
+             else draw_height(1);
+         }
 
          //计数器设置
          save_counter = 0;
@@ -652,6 +661,8 @@ int MainWindow::on_pushButton_Route_Generate_clicked()
                 flying_height = ui->lineEdit_Flying_Height->text().toFloat();
                 int value = ui->dial_Offset_Angle->value();
                 offset_angle_d = (float)(- value + 270);
+
+                up_mode = false;
                 record_start_p();
                 turn_point_cal(); //calculate
             }
@@ -684,44 +695,58 @@ void MainWindow::on_pushButton_Route_Send_clicked()
     }
     else
     {
-        /*only points which have been sent to UAV can be used as break point record*/
-        memcpy(gps_fence_last,gps_fence,24000);
-        memcpy(route_p_gps_last,route_p_gps,16000);
-
-        gps_num_last = gps_num;//store here for break point
-        intersection_num_last = intersection_num;//store here for break point
-
-        if(test_mode)record_break_point(); //for test
-        //insert 2 take off setpoints
-        route_p_send[0][0] = 0.0; //x
-        route_p_send[0][1] = 0.0; //y
-        route_p_send[0][2] = flying_height;//take_off_height; //h
-        route_p_send[1][0] = route_p_local[0][0]; //x
-        route_p_send[1][1] = route_p_local[0][1]; //y
-        route_p_send[1][2] = flying_height;//take_off_height; //h
-        route_p_send_total = intersection_num + 2;
-        cout<<"route_p_send_total"<<route_p_send_total<<endl;
-
-        //insert route points
-        for(int i=0;i<=intersection_num;i++)
+        if(up_mode)
         {
-           route_p_send[i+2][0] = route_p_local[i][0];
-           route_p_send[i+2][1] = route_p_local[i][1];
-           route_p_send[i+2][2] = flying_height;
-           cout<<i<<" "<<route_p_send[i+2][0]<<endl;
+            route_p_send[0][0] = 0.0; //x
+            route_p_send[0][1] = 0.0; //y
+            route_p_send[0][2] = up_height;//take_off_height; //h
+            route_p_send[1][0] = 0.0; //x
+            route_p_send[1][1] = 0.0; //y
+            route_p_send[1][2] = up_height;//take_off_height; //h
+            route_p_send_total = 1;
+            draw_height(1);
         }
-        //turn to even number to correct a bug, start from 0
-        if(route_p_send_total % 2 == 0)
+        else
         {
-            route_p_send_total += 1;
-            route_p_send[route_p_send_total][0] = route_p_local[intersection_num][0];
-            route_p_send[route_p_send_total][1] = route_p_local[intersection_num][1];
-            route_p_send[route_p_send_total][2] = flying_height;
-        }
-        if(route_plan_mode==1 || route_plan_mode==3) common_mode = true;
-        else common_mode = false;
+            /*only points which have been sent to UAV can be used as break point record*/
+            memcpy(gps_fence_last,gps_fence,24000);
+            memcpy(route_p_gps_last,route_p_gps,16000);
 
-        draw_route(1);
+            gps_num_last = gps_num;//store here for break point
+            intersection_num_last = intersection_num;//store here for break point
+
+            if(test_mode)record_break_point(); //for test
+            //insert 2 take off setpoints
+            route_p_send[0][0] = 0.0; //x
+            route_p_send[0][1] = 0.0; //y
+            route_p_send[0][2] = flying_height;//take_off_height; //h
+            route_p_send[1][0] = route_p_local[0][0]; //x
+            route_p_send[1][1] = route_p_local[0][1]; //y
+            route_p_send[1][2] = flying_height;//take_off_height; //h
+            route_p_send_total = intersection_num + 2;
+            cout<<"route_p_send_total"<<route_p_send_total<<endl;
+
+            //insert route points
+            for(int i=0;i<=intersection_num;i++)
+            {
+               route_p_send[i+2][0] = route_p_local[i][0];
+               route_p_send[i+2][1] = route_p_local[i][1];
+               route_p_send[i+2][2] = flying_height;
+               cout<<i<<" "<<route_p_send[i+2][0]<<endl;
+            }
+            //turn to even number to correct a bug, start from 0
+            if(route_p_send_total % 2 == 0)
+            {
+                route_p_send_total += 1;
+                route_p_send[route_p_send_total][0] = route_p_local[intersection_num][0];
+                route_p_send[route_p_send_total][1] = route_p_local[intersection_num][1];
+                route_p_send[route_p_send_total][2] = flying_height;
+            }
+            if(route_plan_mode==1 || route_plan_mode==3) common_mode = true;
+            else common_mode = false;
+
+            draw_route(1);
+        }
 
         send_button_pressed = true;
         ui->textBrowser_Offboard_Message->append("发送中...");
@@ -789,6 +814,45 @@ void MainWindow::draw_gps_fence()
     painter.end();
     fly_route_label->setPixmap(QPixmap::fromImage(image));//在label上显示图片
 
+}
+
+void MainWindow::draw_height(int window)
+{
+    QPainter painter;
+    QImage image;
+
+    if(window == 0)
+    {
+        image.load(":/icon/Icons/grass-720x540-2.png");//定义图片，并在图片上绘图方便显示
+        painter.begin(&image);
+        painter.setPen(QPen(Qt::blue,4));
+        painter.drawLine(image.width()/2, 30, image.width()/2, image.height()-30);
+
+        QRectF rect(image.width()/2+20, 30, image.width()/2+180, 80);
+        painter.drawText(rect, Qt::AlignLeft,tr("目标高度(米): ")+QString::number(up_height));
+
+        painter.end();
+        fly_route_label->setPixmap(QPixmap::fromImage(image));//在label上显示图片
+    }
+    else if(window == 1)
+    {
+        image.load(":/icon/Icons/grass-360x270.jpg");//定义图片，并在图片上绘图方便显示
+        painter.begin(&image);
+        painter.setPen(QPen(Qt::blue,3));
+        painter.drawLine(image.width()/2, 20, image.width()/2, image.height()-20);
+
+        QRectF rect(image.width()/2+10, 20, image.width()/2+180, 50);
+        painter.drawText(rect, Qt::AlignLeft,tr("目标高度(米): ")+QString::number(up_height));
+
+        painter.setPen(QPen(Qt::red,3));
+        float scale = (image.height()-40)/up_height;
+
+        painter.drawEllipse(image.width()/2-5,image.height()-20-(int)(scale*standard_height),10,10);
+
+        painter.end();
+        fly_position_label->setPixmap(QPixmap::fromImage(image));//在label上显示图片
+    }
+    else;
 }
 
 void MainWindow::draw_route(int window)
@@ -1902,6 +1966,7 @@ int MainWindow::on_pushButton_Open_Break_Point_clicked()
 
     ui->pushButton_Break_Paras_Update->setEnabled(true);
 
+    up_mode = false;
     break_point_cal();
 
     return 1;
@@ -2035,12 +2100,37 @@ void MainWindow::on_pushButton_Route_Generate_Common_clicked()
     }*/
     else
     {
+        up_mode = false;
         record_start_p();
         common_flight_cal(common_length,common_width,common_height,common_times,common_side);
         ui->pushButton_Route_Send->setEnabled(true);
     }
 
 }
+
+
+void MainWindow::on_pushButton_Route_Generate_Up_clicked()
+{
+    up_height = ui->lineEdit_Fly_Height_Up->text().toFloat();
+    if(up_height < 0.1)
+    {
+        QMessageBox message_box(QMessageBox::Warning,"警告","请输入合理的飞行高度!", QMessageBox::Cancel, NULL);
+        message_box.exec();
+    }
+    else if(up_height > 50.0)
+    {
+        QMessageBox message_box(QMessageBox::Warning,"警告","超过最大飞行高度!", QMessageBox::Cancel, NULL);
+        message_box.exec();
+    }
+    else
+    {
+        up_mode = true;
+        draw_height(0);
+        ui->pushButton_Route_Send->setEnabled(true);
+    }
+
+}
+
 
 void MainWindow::common_flight_cal(float length, float width, float height, int times, bool left_side)
 {
@@ -2330,3 +2420,5 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         return QMainWindow::eventFilter(obj, event);
     }
 }
+
+

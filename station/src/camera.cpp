@@ -143,10 +143,6 @@ void Camera::readFarme()
     if(bool_image_capture)
     {
         //储存最大100幅临时截图
-        CvFont font;
-        cvInitFont(&font,CV_FONT_HERSHEY_SIMPLEX, 0.8,0.8,0,2);//初始化字体(字体名，字体格式，横向大小比例，纵向大小比例，斜度，粗细)
-        cvPutText(frame_raw,image_name_print,cvPoint(frame_raw->width-800,frame_raw->height-15),&font,CV_RGB(255,255,0));//在图片中输出字符
-
         image_temp[image_counter] = QImage((const uchar*)frame_raw->imageData, frame_raw->width, frame_raw->height,QImage::Format_RGB888).rgbSwapped();
         if(image_counter==100)image_counter=0;
 

@@ -114,6 +114,7 @@ private slots:
     bool restore_point();
     void draw_gps_fence();
     void draw_route(int window); //window 0: draw in planning, window 1: draw in flying window, window 2: draw in time route in flying window, window 3: draw common route in planning window
+    void draw_height(int window); //window 0: draw in planning, window 1: draw in flying window
 
     void gps_to_local(double lat, double lon, float *x, float *y);
     void local_to_gps(float x, float y, double *lat, double *lon);
@@ -164,6 +165,8 @@ private slots:
 
     void on_pushButton_Image_Recovery_clicked();
     void on_checkBox_Ruler_clicked();
+
+    void on_pushButton_Route_Generate_Up_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -223,6 +226,11 @@ private:
     int common_times;
     bool common_side; //left: true; right: false
     bool common_mode; //used when drawing route to calculate different painting scale
+
+    /*for up flight mode*/
+    float up_height;
+    float standard_height;
+    bool up_mode;
 
     /*for break point*/
     bool break_point_flag1;
