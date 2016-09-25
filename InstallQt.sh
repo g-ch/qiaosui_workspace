@@ -9,7 +9,7 @@ sudo apt-get update
 tar zxvf qt-everywhere-opensource-src-4.8.7.tar.gz -C ~/Package
 cd ~/Package
 cd qt-everywhere-opensource-src-4.8.7
-./configure -multimedia -opengl
+./configure -multimedia -opengl -fontconfig
 make
 sudo make install
 sed -i -e '$a QTDIR=/usr/local/Trolltech/Qt-4.8.7/' -e '$a PATH=$QTDIR/bin:$PATH' -e '$a MANPATH=$QTDIR/doc/man:$MANPATH' -e '$a LD_LIBRARY_PATH=$QTDIR/lib:$LD_LIBRARY_PATH' -e '$a export QTDIR PATH MANPATH LD_LIBRARY_PATH' ~/.bashrc
