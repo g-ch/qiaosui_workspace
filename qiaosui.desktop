@@ -1,0 +1,8 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=zuoyun
+Exec=bash -ic "/home/shqs/start.sh"
+Icon=/home/shqs/catkin_ws/src/station/src/Icons/sanfrancisco_bridge_100_100.png
+Terminal=true
+Name[en_US]=qiaosui
