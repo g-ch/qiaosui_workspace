@@ -24,16 +24,17 @@ http://download.qt.io
 一、按装qt4.8.7
 1、需安装几个环境
 终端运行
-sudo apt-get install g++ libX11-dev libXext-dev libXtst-dev
-sudo apt-get install libqglviewer-dev
 sudo apt-get update
+sudo apt-get install g++ libX11-dev libXext-dev libXtst-dev libqglviewer-dev
+
 2、解压tar.gz包
 tar zxvf xxx.tar.gz
 此处xxx为下载的qt-everywhere-opensource-src-4.8.7
 
 4、进入qt4.8.7安装源码的目录
-./configure -multimedia -opengl
- (in case qtopengl is not installded)tar 
+!!!Caution: You should set Chinese language environment before configure!!!!
+./configure -multimedia -opengl -fontconfig
+ (in case qtopengl is not installded)
 choose opensource 
 
 接着就make，然后sudo make install就可以了
