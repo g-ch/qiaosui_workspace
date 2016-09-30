@@ -22,6 +22,7 @@ echo "Accessories installed successfully. Start building workspace."
 #workspace
 mkdir -p ~/catkin_ws/src
 cd ~/catkin_ws/src
+source /opt/ros/jade/setup.bash
 catkin_init_workspace
 cd ..
 catkin_make
